@@ -1,0 +1,95 @@
+﻿#define none 0;
+#define requesting 1;
+#define calculating 1;
+
+#define correct 0;
+#define corrupted 1;
+#define empty -1;
+
+var user_data = correct;
+var cal_prog = correct;
+var bill_request = none;
+
+var sgx_cal_prog = empty;
+var sgx_user_data = empty;
+var sgx_bill = empty;
+var sgx_data_request = none;
+var sgx_status = none;
+
+var proof_prog = empty;
+var proof_data = empty;
+var bill = empty;
+
+
+utility_company() = 
+				[bill == empty && bill_request == none]billrequest{bill_request = requesting} -> utility_company()
+				[]
+				[bill != empty && proof_prog != empty && proof_data != empty]clear{bill = empty;
+													proof_data = empty; proof_prog = empty} -> utility_company();
+
+tre() =
+		[bill_request == requesting && sgx_status != calculating]loadcalprog{sgx_cal_prog = cal_prog; sgx_status = calculating} -> tre()
+		[]
+		[sgx_data_request == requesting]senduserdata{sgx_user_data = user_data; sgx_data_request = none} ->tre();
+
+sgx() = 
+		[sgx_cal_prog != empty && sgx_user_data == empty]requestdata{sgx_data_request = requesting} -> sgx()
+		[]
+		[sgx_cal_prog == correct && sgx_user_data == correct]correctcal{sgx_bill = correct} -> sgx()
+		[]
+		[sgx_cal_prog == corrupted && sgx_user_data == correct]wrongprogbillcal{sgx_bill = corrupted} -> sgx()
+		[]
+		[sgx_cal_prog == correct && sgx_user_data == corrupted]wrongdatabillcal{sgx_bill = corrupted} -> sgx()
+		[]
+		[sgx_cal_prog == corrupted && sgx_user_data == corrupted]bothwrongbillcal{sgx_bill = corrupted} -> sgx()
+		[]
+		[sgx_bill != empty]send{bill = sgx_bill; proof_prog = sgx_cal_prog; proof_data = sgx_user_data; bill_request = none;
+								sgx_cal_prog = empty; sgx_user_data = empty; sgx_bill = empty; sgx_status = none} ->sgx();
+
+attacker() =
+			[user_data == correct]corruptdata{user_data = corrupted} -> attacker()
+			[]
+			[cal_prog == correct]corruptprog{cal_prog = corrupted} -> attacker()
+			[]
+			[user_data == corrupted]revertdata{user_data = correct} -> attacker()
+			[]
+			[cal_prog == corrupted]revertprog{cal_prog = correct} -> attacker();
+			
+stronger_attacker() =
+			[user_data == correct]corruptdata{user_data = corrupted} -> stronger_attacker()
+			[]
+			[cal_prog == correct]corruptprog{cal_prog = corrupted} -> stronger_attacker()
+			[]
+			[user_data == corrupted]revertdata{user_data = correct} -> stronger_attacker()
+			[]
+			[cal_prog == corrupted]revertprog{cal_prog = correct} -> stronger_attacker()
+			[]
+			[sgx_user_data == correct]corruptsgxdata{sgx_user_data = corrupted} -> stronger_attacker()
+			[]
+			[sgx_cal_prog == correct]corruptsgxprog{sgx_cal_prog = corrupted} -> stronger_attacker()
+			[]
+			[sgx_user_data == corrupted]revertsgxdata{sgx_user_data = correct} -> stronger_attacker()
+			[]
+			[sgx_cal_prog == corrupted]revertsgxprog{sgx_cal_prog = correct} -> stronger_attacker();
+
+smart_grid = (utility_company() ||| tre() ||| sgx() ||| attacker());
+
+smart_grid_weak = (utility_company() ||| tre() ||| sgx() ||| stronger_attacker());
+
+#define successful_attack (bill == corrupted && proof_data == correct && proof_prog == correct);
+#define correct_bill (bill == correct && proof_data == correct && proof_prog == correct);
+#define wrong_prog (bill != empty && proof_data == correct && proof_prog == corrupted);
+#define wrong_data (bill != empty && proof_data == corrupted && proof_prog == correct);
+
+#assert smart_grid deadlockfree;
+#assert smart_grid reaches successful_attack;
+#assert smart_grid reaches correct_bill;
+#assert smart_grid reaches wrong_prog;
+#assert smart_grid reaches wrong_data;
+
+
+#assert smart_grid_weak deadlockfree;
+#assert smart_grid_weak reaches successful_attack;
+#assert smart_grid_weak reaches correct_bill;
+#assert smart_grid_weak reaches wrong_prog;
+#assert smart_grid_weak reaches wrong_data;
