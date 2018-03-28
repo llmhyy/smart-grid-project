@@ -1,0 +1,47 @@
+﻿#define none 0;
+#define requesting 1;
+#define calculating 1;
+
+#define correct 0;
+#define corrupted 1;
+#define empty -1;
+
+var user_data = correct;
+var cal_prog = correct;
+var bill_request = none;
+var bill = empty;
+var tre_status = none;
+var tre_result = empty;
+
+
+utility_company() = 
+				[bill == empty && bill_request == none]billrequest{bill_request = requesting} -> utility_company()
+				[]
+				[bill != empty]clear{bill = empty;} -> utility_company();
+
+tre() =
+		[bill_request == requesting &&  tre_status != calculating]startcalculating{tre_status = calculating} -> tre()
+		[]
+		[tre_status == calculating && user_data == correct && cal_prog == correct]correctcalculation{tre_result = correct} -> tre()
+		[] 
+		[tre_status == calculating && (user_data != correct || cal_prog != correct)]wrongcalculation{tre_result = corrupted} -> tre()
+		[]
+		[tre_result != empty]send{bill = tre_result; tre_status = none; bill_request = none;} -> tre();
+
+attacker() =
+			[user_data == correct]corruptdata{user_data = corrupted} -> attacker()
+			[]
+			[cal_prog == correct]corruptprog{cal_prog = corrupted} -> attacker()
+			[]
+			[user_data == corrupted]revertdata{user_data = correct} -> attacker()
+			[]
+			[cal_prog == corrupted]revertprog{cal_prog = correct} -> attacker();
+
+smart_grid = (utility_company() ||| tre() ||| attacker());
+
+#define successful_attack (bill == corrupted);
+#define correct_bill(bill == correct);
+
+#assert smart_grid deadlockfree;
+#assert smart_grid reaches successful_attack;
+#assert smart_grid reaches correct_bill;
