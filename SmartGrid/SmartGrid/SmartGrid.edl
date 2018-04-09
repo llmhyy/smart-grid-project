@@ -1,0 +1,13 @@
+enclave {
+
+    trusted {
+        /* define ECALLs here. */
+		public void calculate(double rate);
+		void sendBill(double result, size_t proof);
+    };
+
+    untrusted {
+        /* define OCALLs here. */
+		double getUserData();
+    };
+};

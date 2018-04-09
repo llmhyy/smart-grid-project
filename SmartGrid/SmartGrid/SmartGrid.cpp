@@ -1,28 +1,24 @@
-// SmartGrid.cpp : Defines the entry point for the console application.
-//
+#include "SmartGrid_t.h"
 
-#pragma once
-#include "stdafx.h"
-#include <iostream>
-#include <string>
-#include "TRE.h"
-#include "UtilityCompany.h"
+#include "sgx_trts.h"
+#include "stdlib.h"
+#include <functional>
 
-using namespace std;
-
-int main()
+//SGX functions
+//SmartGrid bill calculation within SGX
+void calculate(double rate)
 {
-	TRE tre = TRE(100); // 100W
-	UtilityCompany uc = UtilityCompany();
-
-	uc.setTRE(tre);
+	double userdata;
+	getUserData(&userdata);
+	double result = userdata * rate;
 	
-	uc.startBillRequest();
 
-	string result = uc.getResult();
-
-	std::cout << result << std::endl;
-
-    return 0;
+	size_t proof = std::hash<double>{}(rate);
+	sendBill(result, proof);
 }
 
+//SmartGrid send bill to utility company
+void sendBill(double result, size_t proof)
+{
+
+}

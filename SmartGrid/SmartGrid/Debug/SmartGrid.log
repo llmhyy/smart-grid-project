@@ -1,8 +1,17 @@
-﻿  UtilityCompany.cpp
-  TRE.cpp
-  Generating Code...
-  Compiling...
-  SmartGrid.cpp
-  Generating Code...
-  SmartGrid.vcxproj -> c:\users\moon byunghun\documents\visual studio 2015\Projects\SmartGrid\Debug\SmartGrid.exe
-  SmartGrid.vcxproj -> c:\users\moon byunghun\documents\visual studio 2015\Projects\SmartGrid\Debug\SmartGrid.pdb (Full PDB)
+﻿  SmartGrid.cpp
+     Creating library E:\moon\SmartGrid\Debug\SmartGrid.lib and object E:\moon\SmartGrid\Debug\SmartGrid.exp
+  SmartGrid.vcxproj -> E:\moon\SmartGrid\Debug\SmartGrid.dll
+  SmartGrid.vcxproj -> E:\moon\SmartGrid\Debug\SmartGrid.pdb (Full PDB)
+  The required memory is 0x161000.
+  Succeed.
+  <EnclaveConfiguration>
+      <ProdID>0</ProdID>
+      <ISVSVN>0</ISVSVN>
+      <StackMaxSize>0x40000</StackMaxSize>
+      <HeapMaxSize>0x100000</HeapMaxSize>
+      <TCSNum>1</TCSNum>
+      <TCSPolicy>1</TCSPolicy>
+      <DisableDebug>0</DisableDebug>
+      <MiscSelect>0</MiscSelect>
+      <MiscMask>0xFFFFFFFF</MiscMask>
+  </EnclaveConfiguration>
