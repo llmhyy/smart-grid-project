@@ -27,9 +27,15 @@
     <ClCompile Include="SmartGrid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TRE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SmartGrid_u.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TRE.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>

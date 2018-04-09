@@ -1,9 +1,10 @@
-﻿  SmartGrid.cpp
-     Creating library E:\moon\SmartGrid\Debug\SmartGrid.lib and object E:\moon\SmartGrid\Debug\SmartGrid.exp
-  SmartGrid.vcxproj -> E:\moon\SmartGrid\Debug\SmartGrid.dll
-  SmartGrid.vcxproj -> E:\moon\SmartGrid\Debug\SmartGrid.pdb (Full PDB)
-  The required memory is 0x161000.
-  Succeed.
+﻿  Creating proxy/bridge routines
+CUSTOMBUILD : warning : private ECALL `sendBill' is not used by any OCALL
+  SmartGrid.cpp
+  SmartGrid_t.c
+     Creating library E:\moon\New folder\SmartGrid\Debug\SmartGrid.lib and object E:\moon\New folder\SmartGrid\Debug\SmartGrid.exp
+  SmartGrid.vcxproj -> E:\moon\New folder\SmartGrid\Debug\SmartGrid.dll
+  SmartGrid.vcxproj -> E:\moon\New folder\SmartGrid\Debug\SmartGrid.pdb (Full PDB)
   <EnclaveConfiguration>
       <ProdID>0</ProdID>
       <ISVSVN>0</ISVSVN>
@@ -15,3 +16,5 @@
       <MiscSelect>0</MiscSelect>
       <MiscMask>0xFFFFFFFF</MiscMask>
   </EnclaveConfiguration>
+  The required memory is 0x161000.
+  Succeed.

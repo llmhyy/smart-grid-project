@@ -320,8 +320,10 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="TRE.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="TRE.h" />
     <ClInclude Include="SmartGrid_u.h" />
   </ItemGroup>
   <ItemGroup>

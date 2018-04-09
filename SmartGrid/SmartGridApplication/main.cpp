@@ -4,6 +4,9 @@
 #include "SmartGrid_u.h"
 #include "stdio.h"
 #include <string>
+#include <cstdlib>
+#include <ctime>
+#include "TRE.h"
 
 sgx_enclave_id_t eid;
 sgx_status_t ret = SGX_SUCCESS;
@@ -29,8 +32,16 @@ int main()
 {
 	initSGXEnvironment();
 	
-	printf("Hello\n");
+	srand((unsigned)time(0));
+	int randomToken = rand();
+	int proof;
+	double result;
 
+	requestBill(randomToken, proof, result);
+
+	printf("My randomToken is %d\n", randomToken);
+	printf("My proof calculation is %d\n", (randomToken >> 5) + 7);
+	printf("My proof from tre is %d\n", proof);
 
 	clearSGXEnvironment();
 

@@ -1,10 +1,3 @@
-﻿  Creating untrusted proxy/bridge routines
-CUSTOMBUILD : warning : private ECALL `sendBill' is not used by any OCALL
-  SmartGrid.cpp
-  Generating Code...
-  Compiling...
-  main.cpp
-  Generating Code...
-  SmartGrid_u.c
+﻿  main.cpp
   SmartGridApplication.vcxproj -> E:\moon\SmartGrid\Debug\SmartGridApplication.exe
   SmartGridApplication.vcxproj -> E:\moon\SmartGrid\Debug\SmartGridApplication.pdb (Full PDB)
