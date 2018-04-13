@@ -1,0 +1,90 @@
+﻿#define none 0;
+#define requesting 1;
+#define calculating 2;
+#define done 3;
+
+#define correct 0;
+#define corrupted 1;
+#define empty -1;
+
+var uc_random_token = empty;
+var uc_proof = empty;
+var uc_bill_result =  empty;
+
+var bill_request = none;
+var proof = empty;
+var bill = empty;
+
+var tre_status = none;
+var user_data = empty;
+
+// Create random token
+// Send random token and request
+// Check proof
+utility_company() = 
+				[uc_random_token == empty]createrandomtoken{uc_random_token = correct} -> utility_company()
+				[]
+				[uc_random_token == correct && bill_request == none]sendbillrequest{bill_request = requesting} -> utility_company()
+				[]
+				[bill_request == done && uc_proof == empty]calculateproof{uc_proof = correct} -> utility_company()
+				[]
+				[bill_request == done && uc_proof == proof]checkproof{uc_bill_result = correct} -> utility_company()
+				[]
+				[bill_request == done && uc_proof != proof]checkproof{uc_bill_result = corrupted} -> utility_company()
+				[]
+				[uc_bill_result != empty]refresh{bill = empty; uc_random_token = empty; uc_bill_result = none; bill_request = none; proof = none;} -> utility_company();
+
+// Pass input to TRE
+// Pass inut to UC
+communication_channel() =
+				[bill_request == requesting && tre_status == none && uc_random_token == correct]passtotre{tre_status = requesting} -> communication_channel()
+				[]
+				[tre_status == done && bill != empty && proof != empty]passtouc{tre_status = none; bill_request = done} -> communication_channel();
+
+// Calculate proof
+// Calculate bill
+// Send bill
+tre() =
+				[tre_status == requesting && uc_random_token != empty && user_data == empty]getuserdata{user_data = correct} -> tre()
+				[]
+				[tre_status == requesting && uc_random_token != empty && user_data != empty]startcaluclate{tre_status = calculating} -> tre()
+				[]
+				[tre_status == calculating && bill != empty && proof != empty]sendbill{tre_status = done} -> tre()
+				[]
+				[tre_status == calculating && user_data == correct && bill == empty]correctcalculation{bill = correct} -> tre()
+				[]
+				[tre_status == calculating && user_data == corrupted && bill == empty]wrongcalculation{bill = corrupted} -> tre()
+				[]
+				[tre_status == calculating && uc_random_token == correct && proof == empty]correctproof{proof = correct} -> tre()
+				[]
+				[tre_status == calculating && uc_random_token == corrupted && proof == empty]wrongproof{proof = corrupted} -> tre();
+
+
+attacker() =
+			[user_data == correct]corruptdata{user_data = corrupted} -> attacker()
+			[]
+			[proof == correct]corruptproof{proof = corrupted} -> attacker()
+			[]
+			[user_data == corrupted]revertdata{user_data = correct} -> attacker()
+			[]
+			[proof == corrupted]revertproof{proof = correct} -> attacker()
+			[]
+			[uc_random_token == correct]corrupttoken{uc_random_token = corrupted} -> attacker()
+			[]
+			[uc_random_token == corrupted]reverttoken{uc_random_token = correct} -> attacker();
+
+// Needs to be fixed
+attacker_in_sgx() =
+			[user_data == correct]corruptdata{user_data = corrupted} -> attacker()
+			[]
+			[user_data == corrupted]revertdata{user_data = correct} -> attacker();
+
+smart_grid = (utility_company() ||| tre() ||| communication_channel() ||| attacker());
+
+#define uc_gets_correct_answer (bill == correct && uc_bill_result == correct);
+#define uc_can_always_get_correct_answer (bill == corrupted && uc_bill_result == correct);
+
+
+#assert smart_grid deadlockfree;
+#assert smart_grid reaches uc_gets_correct_answer;
+#assert smart_grid reaches uc_can_always_get_correct_answer;
