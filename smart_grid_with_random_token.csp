@@ -82,9 +82,9 @@ attacker_in_sgx() =
 smart_grid = (utility_company() ||| tre() ||| communication_channel() ||| attacker());
 
 #define uc_gets_correct_answer (bill == correct && uc_bill_result == correct);
-#define uc_can_always_get_correct_answer (bill == corrupted && uc_bill_result == correct);
+#define uc_can_always_get_correct_answer (bill == correct && uc_bill_result == correct);
 
 
 #assert smart_grid deadlockfree;
 #assert smart_grid reaches uc_gets_correct_answer;
-#assert smart_grid reaches uc_can_always_get_correct_answer;
+#assert smart_grid |= []<> uc_can_always_get_correct_answer;
