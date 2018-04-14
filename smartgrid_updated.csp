@@ -2,7 +2,6 @@
 #define requesting 1;
 #define calculating 2;
 #define done 3;
-#define passing 4;
 
 #define correct 0;
 #define corrupted 1;
@@ -34,20 +33,22 @@ UC() =
 		[bill_request == done]
 		checkproof
 		{
-			if(uc_random_token == correct){
+			if(uc_random_token == correct && tre_bill == correct){
 				uc_proof = correct;
 			}
 			else{
 				uc_proof = corrupted;
 			}
 			
-			if(uc_proof == tre_proof){
+			if(uc_proof == correct && tre_proof == correct){
 				uc_result = correct;
 			}
 			else{
 				uc_result = corrupted;
 			}
-		} -> endsmartgrid{smartgrid = done} -> UC();
+			
+			smartgrid = done;
+		} -> endsmartgrid -> UC();
 
 C() =
 		[bill_request == requesting]passtotre{tre_random_token = uc_random_token; bill_request = calculating} -> TRE()
@@ -55,7 +56,7 @@ C() =
 		[bill_request == done]passtouc -> UC();
 
 TRE() =
-		[bill_request == calculating]getuserdata{tre_user_data = USER_DATA} -> calculatebill
+		[bill_request == calculating]getuserdata{tre_user_data = USER_DATA} -> calculatebillandproof
 		{
 			if(tre_user_data == correct){
 				tre_bill = correct;
@@ -63,9 +64,8 @@ TRE() =
 			else{
 				tre_bill = corrupted;
 			}
-		} -> createproof
-		{
-			if(tre_random_token == correct){
+			
+			if(tre_random_token == correct && tre_bill == correct){
 				tre_proof = correct;
 			}
 			else{
@@ -74,13 +74,13 @@ TRE() =
 		} -> sendbill{bill_request = done} -> C();
 
 ATTACK(SGX_STATUS) =
-		[smartgrid != done && SGX_STATUS < SGX_ENABLED]modifytrebill{tre_bill = (tre_bill + 1)%2} -> ATTACK(SGX_STATUS)
+		[smartgrid != done]modifytrebill{tre_bill = (tre_bill + 1)%2} -> ATTACK(SGX_STATUS)
 		[]
-		[smartgrid != done && SGX_STATUS < SGX_ENABLED]modifytreproof{tre_proof = (tre_proof + 1)%2} -> ATTACK(SGX_STATUS)
+		[smartgrid != done]modifytreproof{tre_proof = (tre_proof + 1)%2} -> ATTACK(SGX_STATUS)
 		[]
 		[smartgrid != done && SGX_STATUS < SGX_ENABLED]modifytreuserdata{tre_user_data = (tre_user_data + 1)%2} -> ATTACK(SGX_STATUS)
 		[]
-		[smartgrid != done && SGX_STATUS < SGX_ENABLED]modifytrerandomtoken{tre_random_token = (tre_random_token + 1)%2} -> ATTACK(SGX_STATUS)
+		[smartgrid != done]modifytrerandomtoken{tre_random_token = (tre_random_token + 1)%2} -> ATTACK(SGX_STATUS)
 		[]
 		[smartgrid != done && SGX_STATUS < ONLY_UC_SGX_ENABLED]modifyucrandomtoken{uc_random_token = (uc_random_token + 1)%2} -> ATTACK(SGX_STATUS)
 		[]
