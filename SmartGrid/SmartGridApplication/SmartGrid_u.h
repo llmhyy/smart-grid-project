@@ -14,10 +14,10 @@
 extern "C" {
 #endif
 
-double SGX_UBRIDGE(SGX_NOCONVENTION, getUserData, ());
 
-sgx_status_t calculate(sgx_enclave_id_t eid, double rate);
-sgx_status_t sendBill(sgx_enclave_id_t eid, double result, size_t proof);
+sgx_status_t uc_generateToken(sgx_enclave_id_t eid, int* retval);
+sgx_status_t uc_check_proof(sgx_enclave_id_t eid, int* retval, int* proof);
+sgx_status_t tre_bill_calculation(sgx_enclave_id_t eid, int random_token, int* proof);
 
 #ifdef __cplusplus
 }

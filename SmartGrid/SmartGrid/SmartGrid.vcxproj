@@ -362,6 +362,7 @@
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Prerelease|x64'">SmartGrid.config.xml;%(AdditionalInputs)</AdditionalInputs>
     </CustomBuild>
     <None Include="SmartGrid_private.pem" />
+    <None Include="TestingEnc.edl" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="SmartGrid.config.xml" />

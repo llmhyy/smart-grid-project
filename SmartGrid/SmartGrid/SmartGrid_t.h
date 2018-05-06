@@ -14,10 +14,10 @@ extern "C" {
 #endif
 
 
-void calculate(double rate);
-void sendBill(double result, size_t proof);
+int uc_generateToken();
+int uc_check_proof(int* proof);
+void tre_bill_calculation(int random_token, int* proof);
 
-sgx_status_t SGX_CDECL getUserData(double* retval);
 
 #ifdef __cplusplus
 }

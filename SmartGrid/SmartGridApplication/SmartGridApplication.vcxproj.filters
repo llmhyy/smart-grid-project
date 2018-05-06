@@ -27,6 +27,9 @@
     <ClCompile Include="SmartGrid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UtilityCompany.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="TRE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -35,8 +38,11 @@
     <ClInclude Include="SmartGrid_u.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
+    <ClInclude Include="UtilityCompany.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="TRE.h">
-      <Filter>Generated Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

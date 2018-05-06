@@ -2,12 +2,14 @@ enclave {
 
     trusted {
         /* define ECALLs here. */
-		public void calculate(double rate);
-		void sendBill(double result, size_t proof);
+		public int uc_generateToken();
+		public int uc_check_proof([user_check]int* proof);
+		public void tre_bill_calculation(int random_token, [user_check]int* proof);
+
     };
 
     untrusted {
         /* define OCALLs here. */
-		double getUserData();
+		
     };
 };

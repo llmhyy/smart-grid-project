@@ -17,18 +17,19 @@
 } while (0)
 
 
-typedef struct ms_calculate_t {
-	double ms_rate;
-} ms_calculate_t;
+typedef struct ms_uc_generateToken_t {
+	int ms_retval;
+} ms_uc_generateToken_t;
 
-typedef struct ms_sendBill_t {
-	double ms_result;
-	size_t ms_proof;
-} ms_sendBill_t;
+typedef struct ms_uc_check_proof_t {
+	int ms_retval;
+	int* ms_proof;
+} ms_uc_check_proof_t;
 
-typedef struct ms_getUserData_t {
-	double ms_retval;
-} ms_getUserData_t;
+typedef struct ms_tre_bill_calculation_t {
+	int ms_random_token;
+	int* ms_proof;
+} ms_tre_bill_calculation_t;
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -36,27 +37,42 @@ typedef struct ms_getUserData_t {
 #pragma warning(disable: 4200)
 #endif
 
-static sgx_status_t SGX_CDECL sgx_calculate(void* pms)
+static sgx_status_t SGX_CDECL sgx_uc_generateToken(void* pms)
 {
-	CHECK_REF_POINTER(pms, sizeof(ms_calculate_t));
-	ms_calculate_t* ms = SGX_CAST(ms_calculate_t*, pms);
+	CHECK_REF_POINTER(pms, sizeof(ms_uc_generateToken_t));
+	ms_uc_generateToken_t* ms = SGX_CAST(ms_uc_generateToken_t*, pms);
 	sgx_status_t status = SGX_SUCCESS;
 
 
-	calculate(ms->ms_rate);
+	ms->ms_retval = uc_generateToken();
 
 
 	return status;
 }
 
-static sgx_status_t SGX_CDECL sgx_sendBill(void* pms)
+static sgx_status_t SGX_CDECL sgx_uc_check_proof(void* pms)
 {
-	CHECK_REF_POINTER(pms, sizeof(ms_sendBill_t));
-	ms_sendBill_t* ms = SGX_CAST(ms_sendBill_t*, pms);
+	CHECK_REF_POINTER(pms, sizeof(ms_uc_check_proof_t));
+	ms_uc_check_proof_t* ms = SGX_CAST(ms_uc_check_proof_t*, pms);
 	sgx_status_t status = SGX_SUCCESS;
+	int* _tmp_proof = ms->ms_proof;
 
 
-	sendBill(ms->ms_result, ms->ms_proof);
+	ms->ms_retval = uc_check_proof(_tmp_proof);
+
+
+	return status;
+}
+
+static sgx_status_t SGX_CDECL sgx_tre_bill_calculation(void* pms)
+{
+	CHECK_REF_POINTER(pms, sizeof(ms_tre_bill_calculation_t));
+	ms_tre_bill_calculation_t* ms = SGX_CAST(ms_tre_bill_calculation_t*, pms);
+	sgx_status_t status = SGX_SUCCESS;
+	int* _tmp_proof = ms->ms_proof;
+
+
+	tre_bill_calculation(ms->ms_random_token, _tmp_proof);
 
 
 	return status;
@@ -64,50 +80,22 @@ static sgx_status_t SGX_CDECL sgx_sendBill(void* pms)
 
 SGX_EXTERNC const struct {
 	size_t nr_ecall;
-	struct {void* call_addr; uint8_t is_priv;} ecall_table[2];
+	struct {void* call_addr; uint8_t is_priv;} ecall_table[3];
 } g_ecall_table = {
-	2,
+	3,
 	{
-		{(void*)(uintptr_t)sgx_calculate, 0},
-		{(void*)(uintptr_t)sgx_sendBill, 1},
+		{(void*)(uintptr_t)sgx_uc_generateToken, 0},
+		{(void*)(uintptr_t)sgx_uc_check_proof, 0},
+		{(void*)(uintptr_t)sgx_tre_bill_calculation, 0},
 	}
 };
 
 SGX_EXTERNC const struct {
 	size_t nr_ocall;
-	uint8_t entry_table[1][2];
 } g_dyn_entry_table = {
-	1,
-	{
-		{0, 0, },
-	}
+	0,
 };
 
-
-sgx_status_t SGX_CDECL getUserData(double* retval)
-{
-	sgx_status_t status = SGX_SUCCESS;
-
-	ms_getUserData_t* ms = NULL;
-	size_t ocalloc_size = sizeof(ms_getUserData_t);
-	void *__tmp = NULL;
-
-
-	__tmp = sgx_ocalloc(ocalloc_size);
-	if (__tmp == NULL) {
-		sgx_ocfree();
-		return SGX_ERROR_UNEXPECTED;
-	}
-	ms = (ms_getUserData_t*)__tmp;
-	__tmp = (void *)((size_t)__tmp + sizeof(ms_getUserData_t));
-
-	status = sgx_ocall(0, ms);
-
-	if (retval) *retval = ms->ms_retval;
-
-	sgx_ocfree();
-	return status;
-}
 
 #ifdef _MSC_VER
 #pragma warning(pop)

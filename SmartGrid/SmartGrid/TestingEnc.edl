@@ -1,0 +1,12 @@
+enclave {
+
+    trusted {
+        /* define ECALLs here. */
+		public int calculateTest(double rate);
+    };
+
+    untrusted {
+        /* define OCALLs here. */
+
+    };
+};
