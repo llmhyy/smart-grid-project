@@ -1,0 +1,115 @@
+﻿#define none 0;
+#define requesting 1;
+#define calculating 2;
+#define done 3;
+
+#define correct 0;
+#define corrupted 1;
+#define empty -1;
+
+#define SGX_DISABLED 0;
+#define ONLY_UC_SGX_ENABLED 1;
+#define SGX_ENABLED 2;
+
+#define USER_DATA correct;
+
+var smartgrid = requesting;
+
+var result = empty;
+var bill_request = none;
+
+var uc_random_token = empty;
+var uc_result = empty;
+var uc_proof = empty;
+
+var tre_random_token = empty;
+var tre_user_data = empty;
+var tre_bill = empty;
+var tre_proof = empty;
+
+UC() =
+		[bill_request == none]createrandomtoken{uc_random_token = correct} -> sendbillrequest{bill_request = requesting} -> C()
+		[]
+		[bill_request == done]
+		checkproof
+		{
+			if(uc_random_token == correct && tre_bill == correct){
+				uc_proof = correct;
+			}
+			else{
+				uc_proof = corrupted;
+			}
+			
+			if(uc_proof == correct && tre_proof == correct){
+				uc_result = correct;
+			}
+			else{
+				uc_result = corrupted;
+			}
+			
+			smartgrid = done;
+		} -> endsmartgrid -> UC();
+
+C() =
+		[bill_request == requesting]passtotre{tre_random_token = uc_random_token; bill_request = calculating} -> TRE()
+		[]
+		[bill_request == done]passtouc -> UC();
+
+TRE() =
+		[bill_request == calculating]getuserdata{tre_user_data = USER_DATA} -> calculatebillandproof
+		{
+			if(tre_user_data == correct){
+				tre_bill = correct;
+			}
+			else{
+				tre_bill = corrupted;
+			}
+			
+			if(tre_random_token == correct && tre_bill == correct){
+				tre_proof = correct;
+			}
+			else{
+				tre_proof = corrupted;
+			}
+		} -> sendbill{bill_request = done} -> C();
+
+ATTACK(SGX_STATUS) =
+		[smartgrid != done]modifytrebill{tre_bill = (tre_bill + 1)%2} -> ATTACK(SGX_STATUS)
+		[]
+		[smartgrid != done]modifytreproof{tre_proof = (tre_proof + 1)%2} -> ATTACK(SGX_STATUS)
+		[]
+		[smartgrid != done && SGX_STATUS < SGX_ENABLED]modifytreuserdata{tre_user_data = (tre_user_data + 1)%2} -> ATTACK(SGX_STATUS)
+		[]
+		[smartgrid != done]modifytrerandomtoken{tre_random_token = (tre_random_token + 1)%2} -> ATTACK(SGX_STATUS)
+		[]
+		[smartgrid != done && SGX_STATUS < ONLY_UC_SGX_ENABLED]modifyucrandomtoken{uc_random_token = (uc_random_token + 1)%2} -> ATTACK(SGX_STATUS)
+		[]
+		[smartgrid != done && SGX_STATUS < ONLY_UC_SGX_ENABLED]modifyucproof{uc_proof = (uc_proof + 1)%2} -> ATTACK(SGX_STATUS);
+
+
+smartgrid_no_sgx = (UC() ||| C() ||| TRE() ||| ATTACK(SGX_DISABLED));
+smartgrid_uc_sgx = (UC() ||| C() ||| TRE() ||| ATTACK(ONLY_UC_SGX_ENABLED));
+smartgrid_sgx = (UC() ||| C() ||| TRE() ||| ATTACK(SGX_ENABLED));
+
+#define getcorrectbill (uc_result == correct && tre_bill == correct);
+#define acceptswrongbill (uc_result == correct && tre_bill == corrupted);
+#define declineswrongbill (uc_result == corrupted && tre_bill == corrupted);
+
+
+#assert smartgrid_no_sgx deadlockfree;
+#assert smartgrid_no_sgx reaches getcorrectbill;
+#assert smartgrid_no_sgx |= []<> getcorrectbill;
+#assert smartgrid_no_sgx reaches acceptswrongbill;
+#assert smartgrid_no_sgx reaches declineswrongbill;
+
+#assert smartgrid_uc_sgx deadlockfree;
+#assert smartgrid_uc_sgx reaches getcorrectbill;
+#assert smartgrid_uc_sgx |= []<> getcorrectbill;
+#assert smartgrid_uc_sgx reaches acceptswrongbill;
+#assert smartgrid_uc_sgx reaches declineswrongbill;
+
+#assert smartgrid_sgx deadlockfree;
+#assert smartgrid_sgx reaches getcorrectbill;
+#assert smartgrid_sgx |= []<> getcorrectbill;
+#assert smartgrid_sgx reaches acceptswrongbill;
+#assert smartgrid_sgx reaches declineswrongbill;
