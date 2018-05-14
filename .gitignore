@@ -1,1 +1,5 @@
-SmartGrid/SmartGrid.VC.db
+/SmartGrid/SmartGrid.VC.db
+/SmartGrid/SmartGridApplication/x64/Debug
+/SmartGrid/x64/Debug
+/SmartGrid/SmartGrid/x64/Debug
+/SmartGrid/*.opendb

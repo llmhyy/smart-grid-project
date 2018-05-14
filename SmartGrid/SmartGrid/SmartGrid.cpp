@@ -9,7 +9,7 @@ int uc_random_token;
 
 int uc_generateToken()
 {	
-	unsigned char * rand;
+	unsigned char * rand = (unsigned char*)malloc(sizeof(unsigned char));
 	sgx_read_rand(rand, 4);
 	uc_random_token = *rand;
 
