@@ -8,14 +8,20 @@
 #include <string>
 
 
-sgx_enclave_id_t eid;
+sgx_enclave_id_t eid1;
+sgx_enclave_id_t eid2;
 sgx_status_t ret = SGX_SUCCESS;
 sgx_launch_token_t token = { 0 };
 int updated = 0;
 
 void initSGXEnvironment()
 {
-	ret = sgx_create_enclave(ENCLAVE_FILE, SGX_DEBUG_FLAG, &token, &updated, &eid, NULL);
+	ret = sgx_create_enclave(ENCLAVE_FILE, SGX_DEBUG_FLAG, &token, &updated, &eid1, NULL);
+	if (ret != SGX_SUCCESS) {
+		printf("SGX creation failed\n");
+	}
+
+	ret = sgx_create_enclave(ENCLAVE_FILE, SGX_DEBUG_FLAG, &token, &updated, &eid2, NULL);
 	if (ret != SGX_SUCCESS) {
 		printf("SGX creation failed\n");
 	}
@@ -23,7 +29,11 @@ void initSGXEnvironment()
 
 void clearSGXEnvironment()
 {
-	if (sgx_destroy_enclave(eid) != SGX_SUCCESS) {
+	if (sgx_destroy_enclave(eid1) != SGX_SUCCESS) {
+		printf("SGX destroy failed\n");
+	}
+
+	if (sgx_destroy_enclave(eid2) != SGX_SUCCESS) {
 		printf("SGX destroy failed\n");
 	}
 }
@@ -36,12 +46,13 @@ int main()
 	//The attacker is able to modify encrpyted_token, proof, bill.
 	//These are values which are transfered through the channel
 	//and the attacker is able to modify them.
-	UtilityCompany uc = UtilityCompany(eid);
-	TRE tre = TRE(eid);
+	UtilityCompany uc = UtilityCompany(eid1);
+	TRE tre = TRE(eid2);
 	
 	//Random token is generated from Utility Company's SGX
 	int encrypted_token;
 	encrypted_token = uc.generateToken();
+
 
 	//Attacker can modify the token before it reaches to TRE
 	//The modification can be done here.

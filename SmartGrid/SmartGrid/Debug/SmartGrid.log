@@ -1,5 +1,8 @@
-﻿  SmartGrid.cpp
-SmartGrid.cpp(49): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+﻿  Creating proxy/bridge routines
+  SmartGrid.cpp
+SmartGrid.cpp(44): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+e:\moon\smartgrid\smartgrid\smartgrid.cpp(13): warning C4700: uninitialized local variable 'rand' used
+  SmartGrid_t.c
      Creating library E:\moon\SmartGrid\Debug\SmartGrid.lib and object E:\moon\SmartGrid\Debug\SmartGrid.exp
   SmartGrid.vcxproj -> E:\moon\SmartGrid\Debug\SmartGrid.dll
   SmartGrid.vcxproj -> E:\moon\SmartGrid\Debug\SmartGrid.pdb (Full PDB)

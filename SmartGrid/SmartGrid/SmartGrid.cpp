@@ -8,15 +8,10 @@
 int uc_random_token;
 
 int uc_generateToken()
-{
-	//srand(time(0)); 
-	//int random_token = rand();
-
-	//Fixed random number.
-	//Some of the C standard functions are not supported within enclave.
-	//We cannot use srand() to generate random token.
-	//https://software.intel.com/en-us/node/709259
-	uc_random_token = 2398;
+{	
+	unsigned char * rand;
+	sgx_read_rand(rand, 4);
+	uc_random_token = *rand;
 
 	//Encryption
 	int encrypted = uc_random_token + 7;

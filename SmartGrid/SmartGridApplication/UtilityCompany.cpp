@@ -1,5 +1,5 @@
 #include "UtilityCompany.h"
-
+#include <stdio.h>
 
 
 UtilityCompany::UtilityCompany(sgx_enclave_id_t eid)
@@ -12,7 +12,7 @@ int UtilityCompany::generateToken()
 	int encrpted_random_token;
 	
 	uc_generateToken(eid, &encrpted_random_token);
-	
+
 	return encrpted_random_token;
 }
 

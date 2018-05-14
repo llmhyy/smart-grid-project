@@ -18,17 +18,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SmartGrid_t.c">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
     <ClCompile Include="SmartGrid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="SmartGrid_t.h">
+    <ClCompile Include="SmartGrid_t.c">
       <Filter>Generated Files</Filter>
-    </ClInclude>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="SmartGrid_private.pem">
@@ -50,5 +45,10 @@
     <CustomBuild Include="SmartGrid.edl">
       <Filter>Source Files</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SmartGrid_t.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
